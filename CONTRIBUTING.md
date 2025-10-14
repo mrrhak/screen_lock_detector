@@ -1,4 +1,4 @@
-# Contributing to screen_lock_detector
+# Contributing to Screen Lock Detector
 
 Thank you for your interest in contributing!
 

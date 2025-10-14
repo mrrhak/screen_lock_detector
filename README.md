@@ -83,6 +83,16 @@ For Android, this plugin uses `KeyguardManager` and `PowerManager` API to check 
 - ✅ Supports both event streams and manual status checks.
 - ✅ Works on Android and iOS.
 
+> **Note**
+> This plugin does not work on simulators or emulators because it relies on native system events that are not available in these virtual environments. Please test on a physical device.
+
+
+## Installation
+Add `screen_lock_detector` as a dependency in your `pubspec.yaml` file:
+```sh
+flutter pub add screen_lock_detector
+```
+
 ## Usage
 ### Import Plugin
 ```dart
