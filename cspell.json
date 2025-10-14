@@ -3,7 +3,14 @@
   "ignorePaths": [],
   "dictionaryDefinitions": [],
   "dictionaries": [],
-  "words": ["Keyguard", "KITKAT", "lockcomplete", "lockscreen", "paxian"],
+  "words": [
+    "Keyguard",
+    "KITKAT",
+    "lockcomplete",
+    "lockscreen",
+    "paxian",
+    "subosito"
+  ],
   "ignoreWords": [],
   "import": []
 }

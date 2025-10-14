@@ -10,7 +10,7 @@ jobs:
   format-analyze:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -18,14 +18,14 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
       - name: Format check
-        run: flutter format --set-exit-if-changed .
+        run: dart format --set-exit-if-changed .
       - name: Analyze
-        run: flutter analyze
+        run: flutter analyze --fatal-infos .
   test:
     runs-on: ubuntu-latest
     needs: format-analyze
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
