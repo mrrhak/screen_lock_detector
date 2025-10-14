@@ -10,6 +10,7 @@ class MethodChannelScreenLockDetector extends ScreenLockDetectorPlatform {
   @visibleForTesting
   final methodChannel = const MethodChannel('screen_lock_detector_method');
 
+  /// The event channel used to receive screen lock status updates from the native platform.
   @visibleForTesting
   final eventChannel = const EventChannel('screen_lock_detector_event');
 
@@ -25,11 +26,12 @@ class MethodChannelScreenLockDetector extends ScreenLockDetectorPlatform {
   }
 
   @override
-  Future<bool> checkIsLock() async {
-    try {
-      return (await methodChannel.invokeMethod<bool>('checkIsLock')) ?? false;
-    } catch (e) {
-      return false;
-    }
+  Future<ScreenStatus> checkScreenStatus() async {
+    final res = await methodChannel.invokeMethod<String>('checkScreenStatus');
+    return switch (res) {
+      "LOCKED" => ScreenStatus.locked,
+      "UNLOCKED" => ScreenStatus.unlocked,
+      _ => ScreenStatus.unknown,
+    };
   }
 }

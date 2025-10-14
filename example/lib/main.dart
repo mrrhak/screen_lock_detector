@@ -1,3 +1,5 @@
+// ignore_for_file: public_member_api_docs
+
 import 'package:flutter/material.dart';
 
 import 'package:screen_lock_detector/screen_lock_detector.dart';
@@ -19,7 +21,13 @@ class _MyAppState extends State<MyApp> {
     super.initState();
 
     ScreenLockDetector.statusStream.listen((status) {
+      // ignore: avoid_print
       print("==> Screen status: $status");
+      if (status == ScreenStatus.locked) {
+        // Do something here when screen is locked
+      } else if (status == ScreenStatus.unlocked) {
+        // Do something here when screen is unlocked
+      }
     });
   }
 
@@ -27,16 +35,17 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(title: const Text('Plugin example app')),
+        appBar: AppBar(title: const Text('Screen Lock Detector')),
         body: Center(
           child: Column(
             children: [
               ElevatedButton(
                 onPressed: () async {
-                  bool isLock = await ScreenLockDetector.checkIsLock();
-                  print("==> isLock: $isLock");
+                  final status = await ScreenLockDetector.checkScreenStatus();
+                  // ignore: avoid_print
+                  print("==> Screen status: $status");
                 },
-                child: const Text('Check is lock'),
+                child: const Text('Get Screen Status'),
               ),
             ],
           ),

@@ -33,21 +33,14 @@ class ScreenLockDetectorPlugin :
             when (intent?.action) {
                 // Screen turned off (locked or timed out)
                 Intent.ACTION_SCREEN_OFF -> {
-                    val isLocked = _checkIsScreenLocked()
-                    if (isLocked) {
-                        eventSink?.success("LOCKED")
-                    }
+                    val status = _checkScreenStatus()
+                    eventSink?.success(status)
                 }
-
-                // Screen turned on (could be at lock screen or already unlocked)
-                // Intent.ACTION_SCREEN_ON -> { }
 
                 // User successfully unlocked after lock screen
                 Intent.ACTION_USER_PRESENT -> {
-                    val isLocked = _checkIsScreenLocked()
-                    if (!isLocked) {
-                        eventSink?.success("UNLOCKED")
-                    }
+                    val status = _checkScreenStatus()
+                    eventSink?.success(status)
                 }
             }
         }
@@ -65,7 +58,6 @@ class ScreenLockDetectorPlugin :
                 val filter = IntentFilter().apply {
                     addAction(Intent.ACTION_USER_PRESENT)
                     addAction(Intent.ACTION_SCREEN_OFF)
-                    // addAction(Intent.ACTION_SCREEN_ON)
                 }
                 appContext!!.registerReceiver(broadcastReceiver, filter)
             }
@@ -81,9 +73,9 @@ class ScreenLockDetectorPlugin :
         call: MethodCall,
         result: Result
     ) {
-        if (call.method == "checkIsLock") {
-            val isLock = _checkIsScreenLocked();
-            result.success(isLock)
+        if (call.method == "checkScreenStatus") {
+            val status = _checkScreenStatus();
+            result.success(status)
         } else {
             result.notImplemented()
         }
@@ -95,21 +87,23 @@ class ScreenLockDetectorPlugin :
         appContext = null
     }
 
-    private fun _checkIsScreenLocked(): Boolean {
-        val context = appContext ?: return false
+    private fun _checkScreenStatus(): String {
+        val context = appContext ?: return "UNKNOWN"
 
         // Keyguard Manager only work on real device
         val keyguardManager = context.getSystemService(Context.KEYGUARD_SERVICE) as? KeyguardManager
         var isLocked = keyguardManager?.isKeyguardLocked ?: false
+        if(isLocked) return "LOCKED"
 
-        if(!isLocked) {
-            val powerManager = context.getSystemService(Context.POWER_SERVICE) as? PowerManager
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
-                isLocked = !(powerManager?.isInteractive ?: true)
-            } else {
-                isLocked = !(powerManager?.isScreenOn ?: true)
-            }
+        // If password is not set in the settings, the isKeyguardLocked returns false,
+        // so we need to check if screen on for this case
+        val powerManager = context.getSystemService(Context.POWER_SERVICE) as? PowerManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+            isLocked = !(powerManager?.isInteractive ?: true)
+        } else {
+            isLocked = !(powerManager?.isScreenOn ?: true)
         }
-        return isLocked
+        if(isLocked) return "LOCKED"
+        return "UNLOCKED"
     }
 }

@@ -3,6 +3,7 @@ import UIKit
 
 public class ScreenLockDetectorPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
   private var eventSink: FlutterEventSink?
+  private var screenStatus: String = "UNLOCKED"
 
   public static func register(with registrar: FlutterPluginRegistrar) {
     let methodChannel = FlutterMethodChannel(
@@ -14,14 +15,14 @@ public class ScreenLockDetectorPlugin: NSObject, FlutterPlugin, FlutterStreamHan
     eventChannel.setStreamHandler(instance)
 
     NotificationCenter.default.addObserver(
-      self,
+      instance,
       selector: #selector(deviceWillLock),
       name: UIApplication.protectedDataWillBecomeUnavailableNotification,
       object: nil
     )
 
     NotificationCenter.default.addObserver(
-      self,
+      instance,
       selector: #selector(deviceDidUnlock),
       name: UIApplication.protectedDataDidBecomeAvailableNotification,
       object: nil
@@ -30,8 +31,8 @@ public class ScreenLockDetectorPlugin: NSObject, FlutterPlugin, FlutterStreamHan
 
   public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
     switch call.method {
-    case "checkIsLock":
-      return result(_checkIsScreenLocked())
+    case "checkScreenStatus":
+      return result(screenStatus)
     default:
       result(FlutterMethodNotImplemented)
     }
@@ -49,18 +50,17 @@ public class ScreenLockDetectorPlugin: NSObject, FlutterPlugin, FlutterStreamHan
     return nil
   }
 
-  private func _checkIsScreenLocked() -> Bool {
-    // When the device is locked, the system restricts access to “protected data” (like Keychain or sensitive files
-    // So isProtectedDataAvailable == false means device is locked.
-    let isProtectedDataAvailable = UIApplication.shared.isProtectedDataAvailable
-    return !isProtectedDataAvailable
-  }
-
   @objc func deviceWillLock() {
-    self.eventSink?("LOCKED")
+    var status: String = "LOCKED"
+    guard self.screenStatus != status else { return }
+    self.screenStatus = status
+    self.eventSink?(status)
   }
 
   @objc func deviceDidUnlock() {
-    self.eventSink?("UNLOCKED")
+    var status: String = "UNLOCKED"
+    guard self.screenStatus != status else { return }
+    self.screenStatus = status
+    self.eventSink?(status)
   }
 }

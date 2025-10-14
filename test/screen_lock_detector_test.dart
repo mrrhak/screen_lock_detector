@@ -3,7 +3,6 @@ import 'package:screen_lock_detector/screen_lock_detector.dart';
 import 'package:screen_lock_detector/src/screen_lock_detector_platform_interface.dart';
 import 'package:screen_lock_detector/src/screen_lock_detector_method_channel.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
-import 'package:screen_lock_detector/src/common/screen_status.dart';
 
 class MockScreenLockDetectorPlatform
     with MockPlatformInterfaceMixin
@@ -12,7 +11,9 @@ class MockScreenLockDetectorPlatform
   Stream<ScreenStatus> get statusStream => Stream.value(ScreenStatus.locked);
 
   @override
-  Future<bool> checkIsLock() async => true;
+  Future<ScreenStatus> checkScreenStatus() async {
+    return ScreenStatus.locked;
+  }
 }
 
 void main() {
@@ -23,11 +24,11 @@ void main() {
     expect(initialPlatform, isInstanceOf<MethodChannelScreenLockDetector>());
   });
 
-  test('checkIsLock', () async {
+  test('checkScreenStatus', () async {
     MockScreenLockDetectorPlatform fakePlatform =
         MockScreenLockDetectorPlatform();
     ScreenLockDetectorPlatform.instance = fakePlatform;
 
-    expect(await ScreenLockDetector.checkIsLock(), true);
+    expect(await ScreenLockDetector.checkScreenStatus(), ScreenStatus.locked);
   });
 }

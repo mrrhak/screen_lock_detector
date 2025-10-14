@@ -3,6 +3,7 @@ import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'screen_lock_detector_method_channel.dart';
 import 'common/screen_status.dart';
 
+/// The interface that implementations of screen_lock_detector
 abstract class ScreenLockDetectorPlatform extends PlatformInterface {
   /// Constructs a ScreenLockDetectorPlatform.
   ScreenLockDetectorPlatform() : super(token: _token);
@@ -25,11 +26,13 @@ abstract class ScreenLockDetectorPlatform extends PlatformInterface {
     _instance = instance;
   }
 
+  /// A broadcast stream of screen lock status changes.
   Stream<ScreenStatus> get statusStream {
     throw UnimplementedError('statusStream has not been implemented.');
   }
 
-  Future<bool> checkIsLock() {
-    throw UnimplementedError('checkIsLock has not been implemented.');
+  /// Checks the current screen lock status.
+  Future<ScreenStatus> checkScreenStatus() {
+    throw UnimplementedError('checkScreenStatus has not been implemented.');
   }
 }
