@@ -77,7 +77,7 @@ For Android, this plugin uses `KeyguardManager` and `PowerManager` API to check 
 - `ACTION_USER_PRESENT` to detect is **unlocked**
 
 
-## ✨ Features
+## Features
 - ✅ Detect when the screen is locked.
 - ✅ Detect when the screen is unlocked.
 - ✅ Supports both event streams and manual status checks.
