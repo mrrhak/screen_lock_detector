@@ -26,20 +26,13 @@ class ScreenLockDetectorPlugin :
     private lateinit var eventChannel: EventChannel
     private var eventSink: EventChannel.EventSink? = null
     private var appContext: Context? = null
+    private var isReceiverRegistered = false
 
     private val broadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             when (intent?.action) {
-                // Screen turned off (locked or timed out)
-                Intent.ACTION_SCREEN_OFF -> {
-                    val status = _checkScreenStatus()
-                    eventSink?.success(status)
-                }
-
-                // User successfully unlocked after lock screen
-                Intent.ACTION_USER_PRESENT -> {
-                    val status = _checkScreenStatus()
-                    eventSink?.success(status)
+                Intent.ACTION_SCREEN_OFF, Intent.ACTION_USER_PRESENT -> {
+                    eventSink?.success(_checkScreenStatus())
                 }
             }
         }
@@ -54,15 +47,28 @@ class ScreenLockDetectorPlugin :
         eventChannel.setStreamHandler(object : EventChannel.StreamHandler {
             override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
                 eventSink = events
-                val filter = IntentFilter().apply {
-                    addAction(Intent.ACTION_USER_PRESENT)
-                    addAction(Intent.ACTION_SCREEN_OFF)
+                val ctx = appContext
+                if (ctx == null) {
+                    events?.error("UNAVAILABLE", "Plugin not attached to an engine", null)
+                    return
                 }
-                appContext?.registerReceiver(broadcastReceiver, filter)
+                if (!isReceiverRegistered) {
+                    val filter = IntentFilter().apply {
+                        addAction(Intent.ACTION_USER_PRESENT)
+                        addAction(Intent.ACTION_SCREEN_OFF)
+                    }
+                    ctx.registerReceiver(broadcastReceiver, filter)
+                    isReceiverRegistered = true
+                }
             }
 
             override fun onCancel(arguments: Any?) {
-                appContext?.unregisterReceiver(broadcastReceiver)
+                try {
+                    appContext?.unregisterReceiver(broadcastReceiver)
+                } catch (_: IllegalArgumentException) {
+                    // receiver was not registered
+                }
+                isReceiverRegistered = false
                 eventSink = null
             }
         })
@@ -83,10 +89,11 @@ class ScreenLockDetectorPlugin :
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         methodChannel.setMethodCallHandler(null)
         eventChannel.setStreamHandler(null)
-        try {
-            appContext?.unregisterReceiver(broadcastReceiver)
-        } catch (_: IllegalArgumentException) {
-            // receiver was not registered
+        if (isReceiverRegistered) {
+            try {
+                appContext?.unregisterReceiver(broadcastReceiver)
+            } catch (_: IllegalArgumentException) {}
+            isReceiverRegistered = false
         }
         eventSink = null
         appContext = null

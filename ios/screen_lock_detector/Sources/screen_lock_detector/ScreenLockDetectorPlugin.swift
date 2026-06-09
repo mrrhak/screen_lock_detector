@@ -3,7 +3,7 @@ import UIKit
 
 public class ScreenLockDetectorPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
   private var eventSink: FlutterEventSink?
-  private var screenStatus: String = "UNLOCKED"
+  private var screenStatus: String = "UNKNOWN"
 
   public static func register(with registrar: FlutterPluginRegistrar) {
     let methodChannel = FlutterMethodChannel(
@@ -27,6 +27,10 @@ public class ScreenLockDetectorPlugin: NSObject, FlutterPlugin, FlutterStreamHan
       name: UIApplication.protectedDataDidBecomeAvailableNotification,
       object: nil
     )
+  }
+
+  deinit {
+    NotificationCenter.default.removeObserver(self)
   }
 
   public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {

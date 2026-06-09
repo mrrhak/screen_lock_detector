@@ -16,22 +16,14 @@ class MethodChannelScreenLockDetector extends ScreenLockDetectorPlatform {
 
   @override
   Stream<ScreenStatus> get statusStream {
-    return eventChannel.receiveBroadcastStream().map(
-      (e) => switch (e.toString()) {
-        "LOCKED" => ScreenStatus.locked,
-        "UNLOCKED" => ScreenStatus.unlocked,
-        _ => ScreenStatus.unknown,
-      },
-    );
+    return eventChannel
+        .receiveBroadcastStream()
+        .map((e) => ScreenStatus.fromValue(e?.toString()));
   }
 
   @override
   Future<ScreenStatus> checkScreenStatus() async {
     final res = await methodChannel.invokeMethod<String>('checkScreenStatus');
-    return switch (res) {
-      "LOCKED" => ScreenStatus.locked,
-      "UNLOCKED" => ScreenStatus.unlocked,
-      _ => ScreenStatus.unknown,
-    };
+    return ScreenStatus.fromValue(res);
   }
 }
