@@ -9,7 +9,7 @@ enum ScreenStatus {
   /// The screen status is unknown.
   unknown("UNKNOWN");
 
-  /// The string representation of the screen status.
-  final String name;
-  const ScreenStatus(this.name);
+  /// The raw string value exchanged with the native platform.
+  final String value;
+  const ScreenStatus(this.value);
 }

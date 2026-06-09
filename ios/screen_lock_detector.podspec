@@ -5,13 +5,14 @@
 Pod::Spec.new do |s|
   s.name             = 'screen_lock_detector'
   s.version          = '0.0.1'
-  s.summary          = 'A new Flutter plugin project.'
+  s.summary          = 'A Flutter plugin to detect screen lock/unlock events on iOS.'
   s.description      = <<-DESC
-A new Flutter plugin project.
+A Flutter plugin that enables your app to detect screen lock and unlock events on iOS.
+Uses UIApplication notification center APIs to observe protectedData availability changes.
                        DESC
-  s.homepage         = 'http://example.com'
+  s.homepage         = 'https://github.com/mrrhak/screen_lock_detector'
   s.license          = { :file => '../LICENSE' }
-  s.author           = { 'Your Company' => 'email@example.com' }
+  s.author           = { 'Mrr Hak' => 'longkimhak.kh@gmail.com' }
   s.source           = { :path => '.' }
   s.source_files = 'screen_lock_detector/Sources/screen_lock_detector/**/*'
   s.dependency 'Flutter'
@@ -21,9 +22,5 @@ A new Flutter plugin project.
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386' }
   s.swift_version = '5.0'
 
-  # If your plugin requires a privacy manifest, for example if it uses any
-  # required reason APIs, update the PrivacyInfo.xcprivacy file to describe your
-  # plugin's privacy impact, and then uncomment this line. For more information,
-  # see https://developer.apple.com/documentation/bundleresources/privacy_manifest_files
-  # s.resource_bundles = {'screen_lock_detector_privacy' => ['screen_lock_detector/Sources/screen_lock_detector/PrivacyInfo.xcprivacy']}
+  s.resource_bundles = {'screen_lock_detector_privacy' => ['screen_lock_detector/Sources/screen_lock_detector/PrivacyInfo.xcprivacy']}
 end

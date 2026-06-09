@@ -51,14 +51,14 @@ public class ScreenLockDetectorPlugin: NSObject, FlutterPlugin, FlutterStreamHan
   }
 
   @objc func deviceWillLock() {
-    var status: String = "LOCKED"
+    let status: String = "LOCKED"
     guard self.screenStatus != status else { return }
     self.screenStatus = status
     self.eventSink?(status)
   }
 
   @objc func deviceDidUnlock() {
-    var status: String = "UNLOCKED"
+    let status: String = "UNLOCKED"
     guard self.screenStatus != status else { return }
     self.screenStatus = status
     self.eventSink?(status)

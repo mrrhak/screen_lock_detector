@@ -1,11 +1,10 @@
 package com.mrrhak.screen_lock_detector
 
-import android.content.BroadcastReceiver
 import android.app.KeyguardManager
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.os.Build
 import android.os.PowerManager
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin
@@ -59,11 +58,11 @@ class ScreenLockDetectorPlugin :
                     addAction(Intent.ACTION_USER_PRESENT)
                     addAction(Intent.ACTION_SCREEN_OFF)
                 }
-                appContext!!.registerReceiver(broadcastReceiver, filter)
+                appContext?.registerReceiver(broadcastReceiver, filter)
             }
 
             override fun onCancel(arguments: Any?) {
-                appContext!!.unregisterReceiver(broadcastReceiver)
+                appContext?.unregisterReceiver(broadcastReceiver)
                 eventSink = null
             }
         })
@@ -84,6 +83,12 @@ class ScreenLockDetectorPlugin :
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         methodChannel.setMethodCallHandler(null)
         eventChannel.setStreamHandler(null)
+        try {
+            appContext?.unregisterReceiver(broadcastReceiver)
+        } catch (_: IllegalArgumentException) {
+            // receiver was not registered
+        }
+        eventSink = null
         appContext = null
     }
 
@@ -92,18 +97,12 @@ class ScreenLockDetectorPlugin :
 
         // Keyguard Manager only work on real device
         val keyguardManager = context.getSystemService(Context.KEYGUARD_SERVICE) as? KeyguardManager
-        var isLocked = keyguardManager?.isKeyguardLocked ?: false
-        if(isLocked) return "LOCKED"
+        if (keyguardManager?.isKeyguardLocked == true) return "LOCKED"
 
-        // If password is not set in the settings, the isKeyguardLocked returns false,
-        // so we need to check if screen on for this case
+        // If no passcode is set, isKeyguardLocked returns false even when the screen is off,
+        // so also check display interactivity via PowerManager
         val powerManager = context.getSystemService(Context.POWER_SERVICE) as? PowerManager
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
-            isLocked = !(powerManager?.isInteractive ?: true)
-        } else {
-            isLocked = !(powerManager?.isScreenOn ?: true)
-        }
-        if(isLocked) return "LOCKED"
+        if (!(powerManager?.isInteractive ?: true)) return "LOCKED"
         return "UNLOCKED"
     }
 }
