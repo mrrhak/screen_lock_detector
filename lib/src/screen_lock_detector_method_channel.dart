@@ -16,9 +16,9 @@ class MethodChannelScreenLockDetector extends ScreenLockDetectorPlatform {
 
   @override
   Stream<ScreenStatus> get statusStream {
-    return eventChannel
-        .receiveBroadcastStream()
-        .map((e) => ScreenStatus.fromValue(e?.toString()));
+    return eventChannel.receiveBroadcastStream().map(
+      (e) => ScreenStatus.fromValue(e?.toString()),
+    );
   }
 
   @override
